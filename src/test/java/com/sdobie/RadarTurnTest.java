@@ -10,7 +10,7 @@ public class RadarTurnTest {
 
     @Test
     public void shouldFindXPositionInRange() {
-        RadarTurn testObject = new RadarTurn();
+        RadarTurn testObject = new RadarTurn(new Grid().atTurnCount(200));
 
         int result = testObject.randomLocationX();
 
@@ -18,8 +18,17 @@ public class RadarTurnTest {
     }
 
     @Test
+    public void shouldFindXPositionOf5ForTurnLessThan11() {
+        RadarTurn testObject = new RadarTurn(new Grid().atTurnCount(10));
+
+        int result = testObject.randomLocationX();
+
+        assertThat(result, is(5));
+    }
+
+    @Test
     public void shouldFindYPositionInRange() {
-        RadarTurn testObject = new RadarTurn();
+        RadarTurn testObject = new RadarTurn(new Grid().atTurnCount(200));
 
         int result = testObject.randomLocationY();
 

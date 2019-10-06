@@ -15,8 +15,6 @@ class Player {
         int width = in.nextInt();
         int height = in.nextInt(); // size of the map
 
-        int turn = 1;
-
         // game loop
         while (true) {
             map.newTurn();
@@ -36,7 +34,7 @@ class Player {
                 int item = in.nextInt(); // if this entity is a robot, the item it is carrying (-1 for NONE, 2 for RADAR, 3 for TRAP, 4 for ORE)
                 EntityType entityType = EntityType.fromCode(type);
                 if (EntityType.MY_BOT.equals(entityType)) {
-                    if (turn == 1) {
+                    if (map.turnCount == 1) {
                         map.myBots.add(new Bot(id, Position.set(x, y), ItemType.fromCode(item)));
                     }
                     Bot currentBot = map.myBots.get(id);
@@ -45,7 +43,7 @@ class Player {
                 }
             }
             map.turnBots.run();
-            turn++;
+
         }
     }
 
@@ -110,6 +108,7 @@ class Grid {
 
     Bots myBots = new Bots();
     Bots turnBots = new Bots();
+    int turnCount;
 
     public Grid addCell(Cell cell) {
         grid.put(cell.position, cell);
@@ -122,6 +121,12 @@ class Grid {
 
     public void newTurn() {
         turnBots.clear();
+        ++turnCount;
+    }
+
+    Grid atTurnCount(int count) {
+        this.turnCount = count;
+        return this;
     }
 
 }
@@ -146,7 +151,7 @@ class Bot {
     public Bot withRole(Role role) {
         this.role = role;
         if(Role.RADAR == role) {
-            turn = new RadarTurn();
+            turn = new RadarTurn(Player.map);
         }
         return this;
     }
@@ -240,6 +245,12 @@ class RadarTurn implements Turn {
     private static final int RADAR_RADIUS = 4;
     private static final int HEADQUARTERS_SIZE = 1;
 
+    private Grid grid;
+
+    public RadarTurn(Grid grid) {
+        this.grid = grid;
+    }
+
     @Override
     public Bot updateBot(Bot bot) {
         Position currentPosition = bot.position;
@@ -261,7 +272,11 @@ class RadarTurn implements Turn {
     }
 
     int randomLocationX() {
-        return random.nextInt(Grid.WIDTH - RADAR_DIAMETER - HEADQUARTERS_SIZE) + (HEADQUARTERS_SIZE + RADAR_RADIUS);
+        if(grid.turnCount < 11) {
+            return 5;
+        } else {
+            return random.nextInt(Grid.WIDTH - RADAR_DIAMETER - HEADQUARTERS_SIZE) + (HEADQUARTERS_SIZE + RADAR_RADIUS);
+        }
     }
 
     int randomLocationY() {
