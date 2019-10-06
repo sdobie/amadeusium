@@ -27,6 +27,15 @@ public class RadarTurnTest {
     }
 
     @Test
+    public void shouldGetAValueFromInitialPositions() {
+        RadarTurn testObject = new RadarTurn(new Grid());
+
+        Bot result = testObject.updateBot(new Bot(1, Position.NO_POSITION, ItemType.RADAR).withRole(Role.RADAR));
+
+        assertThat(result.destination, is(Position.set(7, 5)));
+    }
+
+    @Test
     public void shouldFindXPositionOf14ForTurns10To20() {
         RadarTurn testObject = new RadarTurn(new Grid().atTurnCount(20));
 

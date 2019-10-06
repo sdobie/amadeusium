@@ -98,6 +98,15 @@ class Position {
         result = 31 * result + y;
         return result;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Position{");
+        sb.append("x=").append(x);
+        sb.append(", y=").append(y);
+        sb.append('}');
+        return sb.toString();
+    }
 }
 
 class Grid {
@@ -109,6 +118,7 @@ class Grid {
     Bots myBots = new Bots();
     Bots turnBots = new Bots();
     int turnCount;
+    Radars initialRadars = new Radars();
 
     public Grid addCell(Cell cell) {
         grid.put(cell.position, cell);
@@ -135,7 +145,7 @@ class Bot {
 
     int id;
     Position position;
-    Position destination;
+    Position destination = Position.NO_POSITION;
     ItemType item;
     Command command = WaitCommand.INSTANCE;
     Role role = Role.MINER;
@@ -255,11 +265,16 @@ class RadarTurn implements Turn {
     public Bot updateBot(Bot bot) {
         Position currentPosition = bot.position;
         if(ItemType.RADAR.equals(bot.item)) {
-            if(currentPosition.equals(bot.destination)) {
-                bot.arriveAtPosition(currentPosition);
-            } else if(bot.destination.equals(Position.NO_POSITION)) {
-                bot.destination = Position.set(randomLocationX(), randomLocationY());
+            if(bot.destination.equals(Position.NO_POSITION)) {
+                if(grid.initialRadars.hasInitial()) {
+                    bot.destination = grid.initialRadars.currentInitialPosition();
+                } else {
+                    bot.destination = Position.set(randomLocationX(), randomLocationY());
+                }
                 bot.command = new MoveCommand(bot.destination);
+            } else if(currentPosition.equals(bot.destination)) {
+                bot.arriveAtPosition(currentPosition);
+                grid.initialRadars.clearInitialPosition();
             } else {
                 bot.command = new MoveCommand(bot.destination);
             }
@@ -376,6 +391,33 @@ class RequestCommand implements Command {
 
     public String write() {
         return "requesting a " + type;
+    }
+}
+
+class Radars {
+    private List<Position> initialPositions;
+
+    public Radars() {
+        initialPositions = Arrays.asList(Position.set(7, 5),
+                Position.set(7, 12),
+                Position.set(16, 12),
+                Position.set(16, 5),
+                Position.set(25, 5),
+                Position.set(25, 12));
+    }
+
+    public boolean hasInitial() {
+        return !initialPositions.isEmpty();
+    }
+
+    public Position currentInitialPosition() {
+        return initialPositions.get(0);
+    }
+
+    public void clearInitialPosition() {
+        if(hasInitial()) {
+            initialPositions.remove(0);
+        }
     }
 }
 
