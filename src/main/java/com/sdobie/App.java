@@ -57,6 +57,8 @@ class Player {
 }
 
 class Position {
+    public static Position NO_POSITION = Position.set(-1, -1);
+
     int x;
     int y;
 
@@ -122,6 +124,8 @@ class Grid {
 }
 
 class Bot {
+    private static Random random = new Random(System.currentTimeMillis());
+
     int id;
     Position position;
     Position destination;
@@ -138,13 +142,23 @@ class Bot {
     public Bot update(Position position, int item, Grid grid) {
         this.position = position;
         this.item = item;
-        Cell oreCell = grid.oreLocation();
-        if(Cell.NO_CELL.equals(oreCell)) {
-            destination = position.move(0, 4);
+        if(position.equals(destination)) {
+            destination = Position.NO_POSITION;
+            command = new DigCommand(position);
         } else {
-            destination = oreCell.position;
+            Cell oreCell = grid.oreLocation();
+            if (Cell.NO_CELL.equals(oreCell)) {
+                destination = position.move(randomLocation(), randomLocation());
+            } else {
+                destination = oreCell.position;
+            }
+            command = new MoveCommand(destination);
         }
         return this;
+    }
+
+    private int randomLocation() {
+        return random.nextInt(8) - 4;
     }
 
     public Bot setCommand(Command command) {
@@ -153,7 +167,6 @@ class Bot {
     }
 
     public void run() {
-        command = new MoveCommand(destination);
         System.err.println("Bot " + id + " " + command.write());
         command.execute();
     }
@@ -243,6 +256,22 @@ class MoveCommand implements Command {
 
     public String write() {
         return "moving to " + position.write();
+    }
+}
+
+class DigCommand implements Command {
+    Position position;
+
+    public DigCommand(Position position) {
+        this.position = position;
+    }
+
+    public void execute() {
+        System.out.println("DIG " + position.write());
+    }
+
+    public String write() {
+        return "digging at " + position.write();
     }
 }
 
