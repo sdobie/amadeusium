@@ -156,7 +156,7 @@ class Bot {
                 if(position.equals(destination)) {
                     arrivalAction(position);
                 } else if(destination.equals(Position.NO_POSITION)) {
-                    destination = position.move(randomLocation(), randomLocation());
+                    destination = position.set(randomLocationX(), randomLocationY());
                     command = new MoveCommand(destination);
                 } else {
                     command = new MoveCommand(destination);
@@ -176,7 +176,7 @@ class Bot {
         } else {
             Cell oreCell = grid.oreLocation();
             if (Cell.NO_CELL.equals(oreCell)) {
-                destination = position.move(randomLocation(), randomLocation());
+                destination = position.set(randomLocationX(), randomLocationY());
             } else {
                 destination = oreCell.position;
             }
@@ -190,8 +190,12 @@ class Bot {
         command = new DigCommand(position);
     }
 
-    private int randomLocation() {
-        return random.nextInt(16) - 8;
+    private int randomLocationX() {
+        return random.nextInt(Grid.WIDTH - 2) + 1;
+    }
+
+    private int randomLocationY() {
+        return random.nextInt(Grid.HEIGHT - 1);
     }
 
     public Bot setCommand(Command command) {
