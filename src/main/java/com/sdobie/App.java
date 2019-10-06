@@ -37,10 +37,10 @@ class Player {
                 EntityType entityType = EntityType.fromCode(type);
                 if (EntityType.MY_BOT.equals(entityType)) {
                     if (turn == 1) {
-                        map.myBots.add(new Bot(id, Position.set(x, y), item));
+                        map.myBots.add(new Bot(id, Position.set(x, y), ItemType.fromCode(item)));
                     }
                     Bot currentBot = map.myBots.get(id);
-                    currentBot.update(Position.set(x, y), item, map);
+                    currentBot.update(Position.set(x, y), ItemType.fromCode(item), map);
                     map.turnBots.add(currentBot);
                 }
             }
@@ -132,22 +132,24 @@ class Bot {
     int id;
     Position position;
     Position destination;
-    int item;
+    ItemType item;
     Command command = WaitCommand.INSTANCE;
 
-    public Bot(int id, Position position, int item) {
+    public Bot(int id, Position position, ItemType item) {
         this.id = id;
         this.position = position;
         this.item = item;
         System.err.println("Bot " + id + " at " + position.write());
     }
 
-    public Bot update(Position position, int item, Grid grid) {
+    public Bot update(Position position, ItemType item, Grid grid) {
         this.position = position;
         this.item = item;
         if(position.equals(destination)) {
             destination = Position.NO_POSITION;
             command = new DigCommand(position);
+        } else if(ItemType.ORE.equals(item)) {
+            destination = Position.set(0, position.y);
         } else {
             Cell oreCell = grid.oreLocation();
             if (Cell.NO_CELL.equals(oreCell)) {
@@ -161,7 +163,7 @@ class Bot {
     }
 
     private int randomLocation() {
-        return random.nextInt(8) - 4;
+        return random.nextInt(16) - 8;
     }
 
     public Bot setCommand(Command command) {
@@ -298,6 +300,30 @@ enum EntityType {
     }
 
     EntityType(int code) {
+        this.code = code;
+    }
+}
+
+enum ItemType {
+
+    NOTHING(-1),
+    RADAR(2),
+    TRAP(3),
+    ORE(4);
+
+    int code;
+
+    public static ItemType fromCode(int code) {
+        for (ItemType type : values()) {
+            if (type.code == code) {
+                return type;
+            }
+        }
+        System.err.println("Unknown ItemType " + code);
+        throw new RuntimeException();
+    }
+
+    ItemType(int code) {
         this.code = code;
     }
 }
