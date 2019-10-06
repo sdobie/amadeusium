@@ -153,15 +153,22 @@ class Bot {
         this.item = item;
         if(Role.RADAR.equals(role)) {
             if(ItemType.RADAR.equals(item)) {
-                destination = position.move(randomLocation(), randomLocation());
-                command = new MoveCommand(destination);
+                if(position.equals(destination)) {
+                    arrivalAction(position);
+                } else if(destination.equals(Position.NO_POSITION)) {
+                    destination = position.move(randomLocation(), randomLocation());
+                    command = new MoveCommand(destination);
+                } else {
+                    command = new MoveCommand(destination);
+                }
+
             } else {
                 command = new RequestCommand();
+                destination = Position.NO_POSITION;
             }
 
         } else if(position.equals(destination)) {
-            destination = Position.NO_POSITION;
-            command = new DigCommand(position);
+            arrivalAction(position);
         } else if(ItemType.ORE.equals(item)) {
             destination = Position.set(0, position.y);
             command = new MoveCommand(destination);
@@ -176,6 +183,11 @@ class Bot {
             command = new MoveCommand(destination);
         }
         return this;
+    }
+
+    private void arrivalAction(Position position) {
+        destination = Position.NO_POSITION;
+        command = new DigCommand(position);
     }
 
     private int randomLocation() {
