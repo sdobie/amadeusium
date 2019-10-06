@@ -23,7 +23,7 @@ public class RadarTurnTest {
 
         int result = testObject.randomLocationX();
 
-        assertThat(result, is(5));
+        assertThat(result, is(7));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class RadarTurnTest {
 
         int result = testObject.randomLocationX();
 
-        assertThat(result, is(14));
+        assertThat(result, is(16));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class RadarTurnTest {
 
         int result = testObject.randomLocationX();
 
-        assertThat(result, is(23));
+        assertThat(result, is(25));
     }
 
     @Test

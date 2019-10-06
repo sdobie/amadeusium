@@ -273,11 +273,11 @@ class RadarTurn implements Turn {
 
     int randomLocationX() {
         if(grid.turnCount < 9) {
-            return 5;
+            return 7;
         } else if(grid.turnCount < 21) {
-            return 14;
+            return 16;
         } else if(grid.turnCount < 41) {
-            return 23;
+            return 25;
         } else {
             return random.nextInt(Grid.WIDTH - RADAR_DIAMETER - HEADQUARTERS_SIZE) + (HEADQUARTERS_SIZE + RADAR_RADIUS);
         }
