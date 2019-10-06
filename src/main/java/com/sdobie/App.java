@@ -1,14 +1,12 @@
 package com.sdobie;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Deliver more ore to hq (left side of the map) than your opponent. Use radars to find ore but beware of traps!
  **/
 class Player {
-    static Map map = new Map();
+    static Grid map = new Grid();
 
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
@@ -22,12 +20,7 @@ class Player {
             map.newTurn();
             int myScore = in.nextInt(); // Amount of ore delivered
             int opponentScore = in.nextInt();
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    String ore = in.next(); // amount of ore or "?" if unknown
-                    int hole = in.nextInt(); // 1 if cell has a hole
-                }
-            }
+            initGrid(in);
             int entityCount = in.nextInt(); // number of entities visible to you
             int radarCooldown = in.nextInt(); // turns left until a new radar can be requested
             int trapCooldown = in.nextInt(); // turns left until a new trap can be requested
@@ -44,12 +37,21 @@ class Player {
                         map.myBots.add(new Bot(id, Position.set(x, y), item));
                     }
                     Bot currentBot = map.myBots.get(id);
-                    currentBot.update(Position.set(x, y), item);
+                    currentBot.update(Position.set(x, y), item, map);
                     map.turnBots.add(currentBot);
                 }
             }
             map.turnBots.run();
             turn++;
+        }
+    }
+
+    private static void initGrid(Scanner in) {
+        for (int i = 0; i < Grid.HEIGHT; i++) {
+            for (int j = 0; j < Grid.WIDTH; j++) {
+                map.addCell(new Cell(Position.set(j, i), in.next()));
+                int hole = in.nextInt(); // 1 if cell has a hole
+            }
         }
     }
 }
@@ -95,14 +97,23 @@ class Position {
     }
 }
 
-class Map {
+class Grid {
     public static int WIDTH = 30;
     public static int HEIGHT = 15;
 
-
+    Map<Position, Cell> grid = new HashMap<>();
 
     Bots myBots = new Bots();
     Bots turnBots = new Bots();
+
+    public Grid addCell(Cell cell) {
+        grid.put(cell.position, cell);
+        return this;
+    }
+
+    public Cell oreLocation() {
+        return grid.values().stream().filter(cell -> cell.hasOre()).findAny().get();
+    }
 
     public void newTurn() {
         turnBots.clear();
@@ -113,6 +124,7 @@ class Map {
 class Bot {
     int id;
     Position position;
+    Position destination;
     int item;
     Command command = WaitCommand.INSTANCE;
 
@@ -123,9 +135,10 @@ class Bot {
         System.err.println("Bot " + id + " at " + position.write());
     }
 
-    public Bot update(Position position, int item) {
+    public Bot update(Position position, int item, Grid grid) {
         this.position = position;
         this.item = item;
+        destination = grid.oreLocation().position;
         return this;
     }
 
@@ -168,7 +181,22 @@ class Bots {
     }
 }
 
-class Site {
+class Cell {
+    Position position;
+    int oreLevel = -1;
+
+    public Cell(Position position, String oreLevel) {
+        this.position = position;
+        if("?".equals(oreLevel)) {
+            this.oreLevel = -1;
+        } else {
+            this.oreLevel = Integer.valueOf(oreLevel);
+        }
+    }
+
+    boolean hasOre() {
+        return oreLevel > 0;
+    }
 
 }
 
