@@ -112,7 +112,7 @@ class Grid {
     }
 
     public Cell oreLocation() {
-        return grid.values().stream().filter(cell -> cell.hasOre()).findAny().get();
+        return grid.values().stream().filter(cell -> cell.hasOre()).findAny().orElse(Cell.NO_CELL);
     }
 
     public void newTurn() {
@@ -138,7 +138,12 @@ class Bot {
     public Bot update(Position position, int item, Grid grid) {
         this.position = position;
         this.item = item;
-        destination = grid.oreLocation().position;
+        Cell oreCell = grid.oreLocation();
+        if(Cell.NO_CELL.equals(oreCell)) {
+            destination = position.move(0, 4);
+        } else {
+            destination = oreCell.position;
+        }
         return this;
     }
 
@@ -182,8 +187,14 @@ class Bots {
 }
 
 class Cell {
+    public static Cell NO_CELL = new Cell();
+
     Position position;
     int oreLevel = -1;
+
+    private Cell() {
+
+    }
 
     public Cell(Position position, String oreLevel) {
         this.position = position;
