@@ -260,11 +260,11 @@ class RadarTurn implements Turn {
         return bot;
     }
 
-    private int randomLocationX() {
+    int randomLocationX() {
         return random.nextInt(Grid.WIDTH - RADAR_DIAMETER - HEADQUARTERS_SIZE) + (HEADQUARTERS_SIZE + RADAR_RADIUS);
     }
 
-    private int randomLocationY() {
+    int randomLocationY() {
         return random.nextInt(Grid.HEIGHT - RADAR_DIAMETER) + RADAR_RADIUS;
     }
 }
