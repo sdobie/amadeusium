@@ -153,7 +153,7 @@ class Bot {
     }
 
     public void run() {
-        command = new MoveCommand(position.move(4, 0));
+        command = new MoveCommand(destination);
         System.err.println("Bot " + id + " " + command.write());
         command.execute();
     }
