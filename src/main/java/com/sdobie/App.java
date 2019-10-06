@@ -150,6 +150,7 @@ class Bot {
             command = new DigCommand(position);
         } else if(ItemType.ORE.equals(item)) {
             destination = Position.set(0, position.y);
+            System.err.println("Bot " + id + " has ore");
         } else {
             Cell oreCell = grid.oreLocation();
             if (Cell.NO_CELL.equals(oreCell)) {
@@ -172,7 +173,7 @@ class Bot {
     }
 
     public void run() {
-        System.err.println("Bot " + id + " " + command.write());
+        System.err.println("Bot " + id + " with " + item + " " + command.write());
         command.execute();
     }
 
