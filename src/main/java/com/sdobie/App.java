@@ -127,7 +127,6 @@ class Grid {
 }
 
 class Bot {
-    private static Random random = new Random(System.currentTimeMillis());
 
     int id;
     Position position;
@@ -135,6 +134,7 @@ class Bot {
     ItemType item;
     Command command = WaitCommand.INSTANCE;
     Role role = Role.MINER;
+    Turn turn;
 
     public Bot(int id, Position position, ItemType item) {
         this.id = id;
@@ -145,6 +145,9 @@ class Bot {
 
     public Bot withRole(Role role) {
         this.role = role;
+        if(Role.RADAR == role) {
+            turn = new RadarTurn();
+        }
         return this;
     }
 
@@ -152,23 +155,9 @@ class Bot {
         this.position = position;
         this.item = item;
         if(Role.RADAR.equals(role)) {
-            if(ItemType.RADAR.equals(item)) {
-                if(position.equals(destination)) {
-                    arrivalAction(position);
-                } else if(destination.equals(Position.NO_POSITION)) {
-                    destination = position.set(randomLocationX(), randomLocationY());
-                    command = new MoveCommand(destination);
-                } else {
-                    command = new MoveCommand(destination);
-                }
-
-            } else {
-                command = new RequestCommand();
-                destination = Position.NO_POSITION;
-            }
-
+            turn.updateBot(this);
         } else if(position.equals(destination)) {
-            arrivalAction(position);
+            arriveAtPosition(position);
         } else if(ItemType.ORE.equals(item)) {
             destination = Position.set(0, position.y);
             command = new MoveCommand(destination);
@@ -185,17 +174,17 @@ class Bot {
         return this;
     }
 
-    private void arrivalAction(Position position) {
+    void arriveAtPosition(Position position) {
         destination = Position.NO_POSITION;
         command = new DigCommand(position);
     }
 
     private int randomLocationX() {
-        return random.nextInt(Grid.WIDTH - 2) + 1;
+        return Turn.random.nextInt(Grid.WIDTH - 2) + 1;
     }
 
     private int randomLocationY() {
-        return random.nextInt(Grid.HEIGHT - 1);
+        return Turn.random.nextInt(Grid.HEIGHT - 1);
     }
 
     public Bot setCommand(Command command) {
@@ -236,6 +225,47 @@ class Bots {
 
     public void clear() {
         bots.clear();
+    }
+}
+
+interface Turn {
+    Random random = new Random(System.currentTimeMillis());
+
+    Bot updateBot(Bot bot);
+}
+
+class RadarTurn implements Turn {
+
+    private static final int RADAR_DIAMETER = 9;
+    private static final int RADAR_RADIUS = 4;
+    private static final int HEADQUARTERS_SIZE = 1;
+
+    @Override
+    public Bot updateBot(Bot bot) {
+        Position currentPosition = bot.position;
+        if(ItemType.RADAR.equals(bot.item)) {
+            if(currentPosition.equals(bot.destination)) {
+                bot.arriveAtPosition(currentPosition);
+            } else if(bot.destination.equals(Position.NO_POSITION)) {
+                bot.destination = Position.set(randomLocationX(), randomLocationY());
+                bot.command = new MoveCommand(bot.destination);
+            } else {
+                bot.command = new MoveCommand(bot.destination);
+            }
+
+        } else {
+            bot.command = new RequestCommand();
+            bot.destination = Position.NO_POSITION;
+        }
+        return bot;
+    }
+
+    private int randomLocationX() {
+        return random.nextInt(Grid.WIDTH - RADAR_DIAMETER - HEADQUARTERS_SIZE) + (HEADQUARTERS_SIZE + RADAR_RADIUS);
+    }
+
+    private int randomLocationY() {
+        return random.nextInt(Grid.HEIGHT - RADAR_DIAMETER) + RADAR_RADIUS;
     }
 }
 
