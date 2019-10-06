@@ -160,7 +160,7 @@ class Bot {
 
     public Bot withRole(Role role) {
         this.role = role;
-        if(Role.RADAR == role) {
+        if (Role.RADAR == role) {
             turn = new RadarTurn(Player.map);
         }
         return this;
@@ -169,11 +169,11 @@ class Bot {
     public Bot update(Position position, ItemType item, Grid grid) {
         this.position = position;
         this.item = item;
-        if(Role.RADAR.equals(role)) {
+        if (Role.RADAR.equals(role)) {
             turn.updateBot(this);
-        } else if(position.equals(destination)) {
+        } else if (position.equals(destination)) {
             arriveAtPosition(position);
-        } else if(ItemType.ORE.equals(item)) {
+        } else if (ItemType.ORE.equals(item)) {
             destination = Position.set(0, position.y);
             command = new MoveCommand(destination);
             System.err.println("Bot " + id + " has ore");
@@ -228,7 +228,7 @@ class Bots {
 
     public Bots add(Bot bot) {
         bots.add(bot);
-        if(bots.size() == 1) {
+        if (bots.size() == 1) {
             bot.withRole(Role.RADAR);
         }
         return this;
@@ -264,15 +264,15 @@ class RadarTurn implements Turn {
     @Override
     public Bot updateBot(Bot bot) {
         Position currentPosition = bot.position;
-        if(ItemType.RADAR.equals(bot.item)) {
-            if(bot.destination.equals(Position.NO_POSITION)) {
-                if(grid.initialRadars.hasInitial()) {
+        if (ItemType.RADAR.equals(bot.item)) {
+            if (bot.destination.equals(Position.NO_POSITION)) {
+                if (grid.initialRadars.hasInitial()) {
                     bot.destination = grid.initialRadars.currentInitialPosition();
                 } else {
                     bot.destination = Position.set(randomLocationX(), randomLocationY());
                 }
                 bot.command = new MoveCommand(bot.destination);
-            } else if(currentPosition.equals(bot.destination)) {
+            } else if (currentPosition.equals(bot.destination)) {
                 bot.arriveAtPosition(currentPosition);
                 grid.initialRadars.clearInitialPosition();
             } else {
@@ -287,11 +287,11 @@ class RadarTurn implements Turn {
     }
 
     int randomLocationX() {
-        if(grid.turnCount < 9) {
+        if (grid.turnCount < 9) {
             return 7;
-        } else if(grid.turnCount < 21) {
+        } else if (grid.turnCount < 21) {
             return 16;
-        } else if(grid.turnCount < 41) {
+        } else if (grid.turnCount < 41) {
             return 25;
         } else {
             return random.nextInt(Grid.WIDTH - RADAR_DIAMETER - HEADQUARTERS_SIZE) + (HEADQUARTERS_SIZE + RADAR_RADIUS);
@@ -315,7 +315,7 @@ class Cell {
 
     public Cell(Position position, String oreLevel) {
         this.position = position;
-        if("?".equals(oreLevel)) {
+        if ("?".equals(oreLevel)) {
             this.oreLevel = -1;
         } else {
             this.oreLevel = Integer.valueOf(oreLevel);
@@ -395,15 +395,15 @@ class RequestCommand implements Command {
 }
 
 class Radars {
-    private List<Position> initialPositions;
+    private List<Position> initialPositions = new ArrayList<>();
 
     public Radars() {
-        initialPositions = Arrays.asList(Position.set(7, 5),
-                Position.set(7, 12),
-                Position.set(16, 12),
-                Position.set(16, 5),
-                Position.set(25, 5),
-                Position.set(25, 12));
+        initialPositions.add(Position.set(7, 4));
+        initialPositions.add(Position.set(7, 12));
+        initialPositions.add(Position.set(16, 12));
+        initialPositions.add(Position.set(16, 4));
+        initialPositions.add(Position.set(25, 4));
+        initialPositions.add(Position.set(25, 12));
     }
 
     public boolean hasInitial() {
@@ -415,7 +415,7 @@ class Radars {
     }
 
     public void clearInitialPosition() {
-        if(hasInitial()) {
+        if (hasInitial()) {
             initialPositions.remove(0);
         }
     }
