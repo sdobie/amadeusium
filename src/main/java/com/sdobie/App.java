@@ -2,6 +2,8 @@ package com.sdobie;
 
 import java.util.*;
 
+import static java.lang.Math.max;
+
 /**
  * Deliver more ore to hq (left side of the map) than your opponent. Use radars to find ore but beware of traps!
  **/
@@ -20,6 +22,7 @@ class Player {
             map.newTurn();
             int myScore = in.nextInt(); // Amount of ore delivered
             int opponentScore = in.nextInt();
+            System.err.println("Score: " + myScore + " to " + opponentScore);
             initGrid(in);
             int entityCount = in.nextInt(); // number of entities visible to you
             int radarCooldown = in.nextInt(); // turns left until a new radar can be requested
@@ -72,7 +75,7 @@ class Position {
     }
 
     public Position move(int deltaX, int deltaY) {
-        return Position.set(x + deltaX, y + deltaY);
+        return Position.set(max(0, x + deltaX), max(0, y + deltaY));
     }
 
     public String write() {
