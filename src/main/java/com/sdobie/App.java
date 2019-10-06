@@ -134,6 +134,7 @@ class Bot {
     Position destination;
     ItemType item;
     Command command = WaitCommand.INSTANCE;
+    Role role = Role.MINER;
 
     public Bot(int id, Position position, ItemType item) {
         this.id = id;
@@ -142,10 +143,23 @@ class Bot {
         System.err.println("Bot " + id + " at " + position.write());
     }
 
+    public Bot withRole(Role role) {
+        this.role = role;
+        return this;
+    }
+
     public Bot update(Position position, ItemType item, Grid grid) {
         this.position = position;
         this.item = item;
-        if(position.equals(destination)) {
+        if(Role.RADAR.equals(role)) {
+            if(ItemType.RADAR.equals(item)) {
+                destination = position.move(randomLocation(), randomLocation());
+                command = new MoveCommand(destination);
+            } else {
+                command = new RequestCommand();
+            }
+
+        } else if(position.equals(destination)) {
             destination = Position.NO_POSITION;
             command = new DigCommand(position);
         } else if(ItemType.ORE.equals(item)) {
@@ -194,6 +208,9 @@ class Bots {
 
     public Bots add(Bot bot) {
         bots.add(bot);
+        if(bots.size() == 1) {
+            bot.withRole(Role.RADAR);
+        }
         return this;
     }
 
@@ -282,6 +299,21 @@ class DigCommand implements Command {
     }
 }
 
+class RequestCommand implements Command {
+    String type = "RADAR";
+
+    public RequestCommand() {
+    }
+
+    public void execute() {
+        System.out.println("REQUEST " + " " + type);
+    }
+
+    public String write() {
+        return "requesting a " + type;
+    }
+}
+
 enum EntityType {
 
     MY_BOT(0),
@@ -328,4 +360,9 @@ enum ItemType {
     ItemType(int code) {
         this.code = code;
     }
+}
+
+enum Role {
+    MINER,
+    RADAR;
 }
