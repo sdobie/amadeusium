@@ -126,7 +126,7 @@ class Grid {
     }
 
     public Cell oreLocation() {
-        return grid.values().stream().filter(cell -> cell.hasOre()).findAny().orElse(Cell.NO_CELL);
+        return grid.values().stream().filter(cell -> cell.hasOre()).findAny().orElse(Cell.NO_CELL).claimOre();
     }
 
     public void newTurn() {
@@ -324,6 +324,11 @@ class Cell {
 
     boolean hasOre() {
         return oreLevel > 0;
+    }
+
+    public Cell claimOre() {
+        --oreLevel;
+        return this;
     }
 
 }
