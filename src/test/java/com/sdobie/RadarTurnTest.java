@@ -32,7 +32,7 @@ public class RadarTurnTest {
 
         Bot result = testObject.updateBot(new Bot(1, Position.NO_POSITION, ItemType.RADAR).withRole(Role.RADAR));
 
-        assertThat(result.destination, is(Position.set(7, 5)));
+        assertThat(result.destination, is(Position.set(7, 4)));
     }
 
     @Test
@@ -60,5 +60,16 @@ public class RadarTurnTest {
         int result = testObject.randomLocationY();
 
         assertThat(result, is(both(greaterThanOrEqualTo(0)).and(lessThan(11))));
+    }
+
+    @Test
+    public void shouldSetBotToMinerWhenTurnGreaterThan80AndNoItem() {
+        RadarTurn testObject = new RadarTurn(new Grid().atTurnCount(81));
+
+        Bot result = testObject.updateBot(new Bot(1, Position.set(0, 0), ItemType.RADAR).withRole(Role.RADAR)
+                .withDestination(Position.set(0, 0)));
+
+        assertThat(result.role(), is(Role.MINER));
+
     }
 }

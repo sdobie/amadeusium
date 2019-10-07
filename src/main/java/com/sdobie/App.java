@@ -148,7 +148,7 @@ class Bot {
     Position destination = Position.NO_POSITION;
     ItemType item;
     Command command = WaitCommand.INSTANCE;
-    Role role = Role.MINER;
+    private Role role = Role.MINER;
     Turn turn;
 
     public Bot(int id, Position position, ItemType item) {
@@ -163,6 +163,15 @@ class Bot {
         if (Role.RADAR == role) {
             turn = new RadarTurn(Player.map);
         }
+        return this;
+    }
+
+    public Role role() {
+        return role;
+    }
+
+    public Bot withDestination(Position destination) {
+        this.destination = destination;
         return this;
     }
 
@@ -275,6 +284,9 @@ class RadarTurn implements Turn {
             } else if (currentPosition.equals(bot.destination)) {
                 bot.arriveAtPosition(currentPosition);
                 grid.initialRadars.clearInitialPosition();
+                if(grid.turnCount > 80) {
+                    bot.withRole(Role.MINER);
+                }
             } else {
                 bot.command = new MoveCommand(bot.destination);
             }
