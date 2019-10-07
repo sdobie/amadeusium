@@ -35,7 +35,7 @@ class Player {
                 EntityType entityType = EntityType.fromCode(type);
                 if (EntityType.MY_BOT.equals(entityType)) {
                     if (map.turnCount == 1) {
-                        map.myBots.add(new Bot(id, Position.set(x, y), ItemType.fromCode(item)));
+                        initBot(id, x, y, item);
                     }
                     Bot currentBot = map.myBots.get(id);
                     currentBot.update(Position.set(x, y), ItemType.fromCode(item), map);
@@ -45,6 +45,14 @@ class Player {
             map.turnBots.run();
 
         }
+    }
+
+    private static void initBot(int id, int x, int y, int item) {
+        Bot bot = new Bot(id, Position.set(x, y), ItemType.fromCode(item));
+        if(map.myBots.isEmpty()) {
+            bot.withRole(Role.RADAR);
+        }
+        map.myBots.add(bot);
     }
 
     private static void initGrid(Scanner in) {
@@ -250,9 +258,6 @@ class Bots {
 
     public Bots add(Bot bot) {
         bots.add(bot);
-        if (bots.size() == 1) {
-            bot.withRole(Role.RADAR);
-        }
         return this;
     }
 
@@ -262,6 +267,10 @@ class Bots {
 
     public void clear() {
         bots.clear();
+    }
+
+    public boolean isEmpty() {
+        return bots.isEmpty();
     }
 }
 
