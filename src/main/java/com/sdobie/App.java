@@ -217,10 +217,23 @@ class Bot {
     }
 
     public void run() {
-        System.err.println("Bot " + id + " with " + item + " " + command.write());
+        System.err.println("Bot " + role + " " + id + " with " + item + " " + command.write());
         command.execute();
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Bot{");
+        sb.append("id=").append(id);
+        sb.append(", position=").append(position);
+        sb.append(", destination=").append(destination);
+        sb.append(", item=").append(item);
+        sb.append(", command=").append(command);
+        sb.append(", role=").append(role);
+        sb.append(", turn=").append(turn);
+        sb.append('}');
+        return sb.toString();
+    }
 }
 
 class Bots {
@@ -285,6 +298,7 @@ class RadarTurn implements Turn {
                 bot.arriveAtPosition(currentPosition);
                 grid.initialRadars.clearInitialPosition();
                 if(grid.turnCount > 80) {
+                    System.err.println("Switching to miner");
                     bot.withRole(Role.MINER);
                 }
             } else {
@@ -488,5 +502,5 @@ enum ItemType {
 
 enum Role {
     MINER,
-    RADAR;
+    RADAR
 }
