@@ -49,7 +49,7 @@ class Player {
 
     private static void initBot(int id, int x, int y, int item) {
         Bot bot = new Bot(id, Position.set(x, y), ItemType.fromCode(item));
-        if(map.myBots.isEmpty()) {
+        if (map.myBots.isEmpty()) {
             bot.withRole(Role.RADAR);
         }
         map.myBots.add(bot);
@@ -170,6 +170,8 @@ class Bot {
         this.role = role;
         if (Role.RADAR == role) {
             turn = new RadarTurn(Player.map);
+        } else if(Role.MINER == role) {
+            turn = new MinerTurn(Player.map);
         }
         return this;
     }
@@ -186,42 +188,13 @@ class Bot {
     public Bot update(Position position, ItemType item, Grid grid) {
         this.position = position;
         this.item = item;
-        if (Role.RADAR.equals(role)) {
-            turn.updateBot(this);
-        } else if (position.equals(destination)) {
-            arriveAtPosition(position);
-        } else if (ItemType.ORE.equals(item)) {
-            destination = Position.set(0, position.y);
-            command = new MoveCommand(destination);
-            System.err.println("Bot " + id + " has ore");
-        } else {
-            Cell oreCell = grid.oreLocation();
-            if (Cell.NO_CELL.equals(oreCell)) {
-                destination = position.set(randomLocationX(), randomLocationY());
-            } else {
-                destination = oreCell.position;
-            }
-            command = new MoveCommand(destination);
-        }
+        turn.updateBot(this);
         return this;
     }
 
     void arriveAtPosition(Position position) {
         destination = Position.NO_POSITION;
         command = new DigCommand(position);
-    }
-
-    private int randomLocationX() {
-        return Turn.random.nextInt(Grid.WIDTH - 2) + 1;
-    }
-
-    private int randomLocationY() {
-        return Turn.random.nextInt(Grid.HEIGHT - 1);
-    }
-
-    public Bot setCommand(Command command) {
-        this.command = command;
-        return this;
     }
 
     public void run() {
@@ -306,7 +279,7 @@ class RadarTurn implements Turn {
             } else if (currentPosition.equals(bot.destination)) {
                 bot.arriveAtPosition(currentPosition);
                 grid.initialRadars.clearInitialPosition();
-                if(grid.turnCount > 80) {
+                if (grid.turnCount > 80) {
                     System.err.println("Switching to miner");
                     bot.withRole(Role.MINER);
                 }
@@ -335,6 +308,42 @@ class RadarTurn implements Turn {
 
     int randomLocationY() {
         return random.nextInt(Grid.HEIGHT - RADAR_DIAMETER) + RADAR_RADIUS;
+    }
+}
+
+class MinerTurn implements Turn {
+    private Grid grid;
+
+    public MinerTurn(Grid grid) {
+        this.grid = grid;
+    }
+
+    public Bot updateBot(Bot bot) {
+        Position currentPosition = bot.position;
+        if (currentPosition.equals(bot.destination)) {
+            bot.arriveAtPosition(currentPosition);
+        } else if (ItemType.ORE.equals(bot.item)) {
+            bot.destination = Position.set(0, currentPosition.y);
+            bot.command = new MoveCommand(bot.destination);
+            System.err.println("Bot " + bot.id + " has ore");
+        } else {
+            Cell oreCell = grid.oreLocation();
+            if (Cell.NO_CELL.equals(oreCell)) {
+                bot.destination = currentPosition.set(randomLocationX(), randomLocationY());
+            } else {
+                bot.destination = oreCell.position;
+            }
+            bot.command = new MoveCommand(bot.destination);
+        }
+        return bot;
+    }
+
+    private int randomLocationX() {
+        return Turn.random.nextInt(Grid.WIDTH - 2) + 1;
+    }
+
+    private int randomLocationY() {
+        return Turn.random.nextInt(Grid.HEIGHT - 1);
     }
 }
 
@@ -440,8 +449,10 @@ class Radars {
     public Radars() {
         initialPositions.add(Position.set(7, 4));
         initialPositions.add(Position.set(7, 12));
+        initialPositions.add(Position.set(12, 8));
         initialPositions.add(Position.set(16, 12));
         initialPositions.add(Position.set(16, 4));
+        initialPositions.add(Position.set(20, 8));
         initialPositions.add(Position.set(25, 4));
         initialPositions.add(Position.set(25, 12));
     }
