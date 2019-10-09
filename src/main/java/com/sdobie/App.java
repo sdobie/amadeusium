@@ -51,6 +51,8 @@ class Player {
         Bot bot = new Bot(id, Position.set(x, y), ItemType.fromCode(item));
         if (map.myBots.isEmpty()) {
             bot.withRole(Role.RADAR);
+        } else {
+            bot.withRole(Role.MINER);
         }
         map.myBots.add(bot);
     }
