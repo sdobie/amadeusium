@@ -143,6 +143,19 @@ class Grid {
         return grid.values().stream().filter(cell -> cell.hasOre()).findAny().orElse(Cell.NO_CELL).claimOre();
     }
 
+    public Cell closestOreToPosition(Position position) {
+        Cell result = Cell.NO_CELL;
+        int maxDistance = 50;
+        for(Cell cell: grid.values()) {
+            int distance = cell.position.distanceTo(position);
+            if(cell.hasOre() && distance < maxDistance) {
+                result = cell;
+                maxDistance = distance;
+            }
+        }
+        return result.claimOre();
+    }
+
     public void newTurn() {
         turnBots.clear();
         ++turnCount;
@@ -336,7 +349,7 @@ class MinerTurn implements Turn {
             bot.command = new MoveCommand(bot.destination);
             System.err.println("Bot " + bot.id + " has ore");
         } else {
-            Cell oreCell = grid.oreLocation();
+            Cell oreCell = grid.closestOreToPosition(currentPosition);
             if (Cell.NO_CELL.equals(oreCell)) {
                 bot.destination = currentPosition.set(randomLocationX(), randomLocationY());
             } else {
