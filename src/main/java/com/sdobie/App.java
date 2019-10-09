@@ -320,7 +320,10 @@ class MinerTurn implements Turn {
 
     public Bot updateBot(Bot bot) {
         Position currentPosition = bot.position;
-        if (currentPosition.equals(bot.destination)) {
+        if(grid.turnCount == 1) {
+            bot.destination = Position.set(4, currentPosition.y);
+            bot.command = new MoveCommand(bot.destination);
+        } else if (currentPosition.equals(bot.destination)) {
             bot.arriveAtPosition(currentPosition);
         } else if (ItemType.ORE.equals(bot.item)) {
             bot.destination = Position.set(0, currentPosition.y);
