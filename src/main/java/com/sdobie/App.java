@@ -90,6 +90,10 @@ class Position {
         return "" + x + " " + y;
     }
 
+    public int distanceTo(Position position) {
+        return Math.abs(position.x - x) + Math.abs(position.y - y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
