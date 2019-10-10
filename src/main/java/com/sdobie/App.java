@@ -221,7 +221,7 @@ class Bot {
 
     void arriveAtPosition(Position position) {
         destination = Position.NO_POSITION;
-        command = new DigCommand(position);
+        command = new DigCommand(position.move(1, 0));
     }
 
     public void run() {
@@ -357,11 +357,11 @@ class MinerTurn implements Turn {
             bot.command = new MoveCommand(bot.destination);
             System.err.println("Bot " + bot.id + " has ore");
         } else {
-            Cell digCell = grid.leftNeighborOf(grid.closestOreToPosition(currentPosition));
-            if (Cell.NO_CELL.equals(digCell)) {
+            Cell destinationCell = grid.leftNeighborOf(grid.closestOreToPosition(currentPosition));
+            if (Cell.NO_CELL.equals(destinationCell)) {
                 bot.destination = currentPosition.set(randomLocationX(), randomLocationY());
             } else {
-                bot.destination = digCell.position;
+                bot.destination = destinationCell.position;
             }
             bot.command = new MoveCommand(bot.destination);
         }
