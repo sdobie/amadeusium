@@ -350,9 +350,9 @@ class MinerTurn implements Turn {
         if(grid.turnCount < 5) {
             bot.destination = Position.set(currentPosition.x + 2, currentPosition.y);
             bot.command = new MoveCommand(bot.destination);
-        } else if (currentPosition.equals(bot.destination)) {
+        } else if (currentPosition.equals(bot.destination) && (currentPosition.x != 0)) {
             bot.arriveAtPosition(currentPosition);
-        } else if (ItemType.ORE.equals(bot.item)) {
+        } else if (ItemType.ORE.equals(bot.item) && (currentPosition.x != 0)) {
             bot.destination = Position.set(0, currentPosition.y);
             bot.command = new MoveCommand(bot.destination);
             System.err.println("Bot " + bot.id + " has ore");
