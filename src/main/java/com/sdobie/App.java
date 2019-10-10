@@ -166,6 +166,14 @@ class Grid {
         return this;
     }
 
+    public Cell leftNeighborOf(Cell cell) {
+        if(Cell.NO_CELL.equals(cell)) {
+            return cell;
+        }
+        Position leftPosition = Position.set(max(0, cell.position.x - 1), cell.position.y);
+        return grid.get(leftPosition);
+    }
+
 }
 
 class Bot {
@@ -349,11 +357,11 @@ class MinerTurn implements Turn {
             bot.command = new MoveCommand(bot.destination);
             System.err.println("Bot " + bot.id + " has ore");
         } else {
-            Cell oreCell = grid.closestOreToPosition(currentPosition);
-            if (Cell.NO_CELL.equals(oreCell)) {
+            Cell digCell = grid.leftNeighborOf(grid.closestOreToPosition(currentPosition));
+            if (Cell.NO_CELL.equals(digCell)) {
                 bot.destination = currentPosition.set(randomLocationX(), randomLocationY());
             } else {
-                bot.destination = oreCell.position;
+                bot.destination = digCell.position;
             }
             bot.command = new MoveCommand(bot.destination);
         }
